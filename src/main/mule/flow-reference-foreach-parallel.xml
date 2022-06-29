@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="930b446f-bde6-4313-a691-24a063f04068" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="quzie1" doc:id="476f45e5-43e1-481a-94ae-bc2bd652481b" >
+		<http:listener doc:name="Listener" doc:id="f8ef24c8-ffa6-4e8c-8e2a-1445e24c5880" config-ref="HTTP_Listener_config" path="/for-each"/>
+		<set-payload value="#[[100,200,300,400]]" doc:name="[100,200,300,400]" doc:id="0bb2bad2-8d13-4eca-8adb-9d501a4899ca" />
+		<set-variable value="#[max(payload)]" doc:name="max(payload)" doc:id="6997084a-87fe-4973-9928-1980a79e3d7b" variableName="max_payload"/>
+		<logger level="INFO" doc:name="Logger" doc:id="30768aec-d1fe-4a71-966c-1428ff3d729f" message="The is payload:#[payload] and the variable is:#[vars.max_payload]"/>
+		<foreach doc:name="For Each" doc:id="12d5690c-63b9-42ca-a0a0-2ee7e21faade" >
+			<set-payload value="#[payload*0.9]" doc:name="10% discount" doc:id="b7a19951-1bdc-42db-b276-dbb212762bfc" />
+			<set-variable value="#[vars.max_payload +10]" doc:name="add 10" doc:id="60862d7e-a520-468b-893c-3b7de980d823" variableName="max_payload"/>
+			<logger level="INFO" doc:name="............................" doc:id="b80c8b78-821b-488e-82b9-7e684d23377b" message="............................................................................................................................................................."/>
+			<logger level="INFO" doc:name="payload and variable" doc:id="1010098f-58ca-4fe2-b95b-fb7a23931688" message="The payload is:#[payload] and the variable is:#[vars.max_payload]"/>
+		</foreach>
+		<logger level="INFO" doc:name="payload and variable" doc:id="f9d13939-1171-4eb0-90af-77c7f04f7166" message="The payload is:#[payload] and the variable is:#[vars.max_payload]"/>
+		<ee:transform doc:name="flow end message" doc:id="c9368991-35d5-406b-8800-c28845647f29" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="quzie2" doc:id="871c093a-a508-46ac-b59b-417e86898ab7" >
+		<http:listener doc:name="Listener" doc:id="9d41fdb0-07db-4794-9796-92cd23f0f888" config-ref="HTTP_Listener_config" path="/pfor-each"/>
+		<set-payload value="[100,200,300,400]" doc:name="[100,200,300,400]" doc:id="d854cfa6-9a01-43ac-8e6a-ee5a211c3e1c" />
+		<set-variable value="#[max(payload)]" doc:name="max(payload)" doc:id="7a5a93e1-f24a-4030-ab1a-0a98c7bbadbb" variableName="max_payload"/>
+		<logger level="INFO" doc:name="Logger" doc:id="86501bc1-edf3-4821-a03b-9f54e9e9e12d" message="The is payload:#[payload] and the variable is:#[vars.max_payload]"/>
+		<parallel-foreach doc:name="Parallel For Each" doc:id="95fde6c1-bddc-436d-b562-559be7017dd2" >
+			<set-payload value="#[payload*0.9]" doc:name="10% discount" doc:id="9fb104c5-5540-4892-a68b-d2590ad4ab97" />
+			<set-variable value="#[vars.max_payload +10]" doc:name="add 10" doc:id="bb581882-2543-404c-89fa-fa18f24da2ce" variableName="max(payload)"/>
+			<logger level="INFO" doc:name="............................." doc:id="ff26798e-215c-42ad-aa27-b7d8c8f05717" message="....................................................................................................................................................................."/>
+			<logger level="INFO" doc:name="payload and variable" doc:id="5cb9549a-c6b5-4214-b30e-4ebb9d7d33c4" message="The payload is:#[payload] and the variable is:#[vars.max_payload]"/>
+		</parallel-foreach>
+		<logger level="INFO" doc:name="payload and variables" doc:id="4ed60904-954b-4c66-841f-3733aa622d38" message="The payload is:#[payload] and the variable is:#[vars.max_payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="134abd5f-5d75-4c31-859b-d7afc6b98831" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
